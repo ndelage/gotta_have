@@ -1,0 +1,62 @@
+= GottaHave
+
+Checks for specific versions of command line utilities.
+
+== Usage
+
+If you make use of command line utilities (e.g. convert, exiftool, unzip ) it
+is often necessary to ensure you have the correct version of these utilities
+installed, much like using the correct version of a Ruby gem. GottaHave allows
+you to specify which binaries you should have installed and which versions.
+
+Specify your requirements by setting the requirements hash, for example:
+
+GottaHave::ExecutableChecker.requirements = {'exiftool' => {:version => '8.13' },
+                                             'convert' => {:version => '6.5.9-9' },
+                                             'identify' => {:version => '6.5.9-9' } }
+
+
+You can also allow newer versions by setting the :allow_newer option to true:
+'unzip' => {:version => '5.52', :allow_newer => true }
+
+GottaHave can determine the installed version number for a small number of
+command utilities:
+
+-exiftool
+-convert
+-identify
+-macunpack
+-unzip
+-file
+
+You can easily add support for other utilites by setting the :check_cmd option:
+'watch' => {:version => '0.2.0', :check_cmd => "watch --version 2>&1"}
+
+As in the example above, sometimes it's necessary to redirect stderr to stdout
+in order to capture the version information.
+
+GottaHave depends on the open4 to run and collect output from the command line.
+
+
+== License
+
+Copyright (c) 2011 Nate Delage
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
