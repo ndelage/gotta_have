@@ -4,6 +4,7 @@ module GottaHave
     require 'versionomy'
 
     class << self; attr_accessor :requirements end
+    
     @requirements = {}
 
     VERSION_CHECK_COMMANDS = {'exiftool' => "exiftool -ver",
@@ -17,6 +18,8 @@ module GottaHave
       for executable in self.requirements.keys
         self.check_dependency( executable, self.requirements[executable] )
       end
+
+      return true
     end
 
     def self.check_dependency( executable, config )
@@ -30,20 +33,25 @@ module GottaHave
 
     def self.installed_version( executable, version_check_override=nil )
       check = version_check_override || VERSION_CHECK_COMMANDS[executable]
-      if check
+      if check.nil?
+        raise GottaHave::MissingVersionCheckException, "No way to look up the installed version for #{executable}"
+      end
+
+      # CmdLineHelpers will throw a generic exception if we don't have a clean (0)
+      # return code, so we catch the generic exception and raise our own
+      begin
         version = CmdLineHelpers.execute_command( check, "requirement check" ).strip
         if version.length == 0
           raise GottaHave::VersionCheckFailException, "Unable to determine the installed version of #{executable}"
         else
           return version
         end
-      else
-        raise GottaHave::MissingVersionCheckException, "No way to look up the installed version for #{executable}"
+      rescue
+        raise GottaHave::VersionCheckFailException, "Unable to determine the installed version of #{executable}"
       end
     end
 
     def self.correct_version?( required, installed, allow_newer=false )
-
       required = Versionomy.parse( required )
       installed = Versionomy.parse( installed )
       

@@ -107,15 +107,62 @@ class DependencyCheckerTest < Test::Unit::TestCase
 
   end
 
-  context "when a check_cmd doesn't exist for an executable" do
-    should "raise exception" do
-      assert_raise( GottaHave::MissingVersionCheckException ) {DependencyChecker.check_dependency( 'unknown', {:version => 1.0} )}
+  context "Checking dependencies" do
+    setup do
+      @sample_name = "cmd"
+      @sample_name_2 = "cmd2"
+      @sample_cmd = "cmd -version"
+      @sample_version = "1.0"
+      @sample_config = {:version => @sample_version}
     end
-  end
 
-  context "when a version isn't identified" do
-    should "raise exception" do
-      assert_raise (GottaHave::VersionCheckFailException) {DependencyChecker.check_dependency( 'unknown', {:version => 1.0, :check_cmd => ""} )}
+    context "When checking a single dependency" do
+      should "call #installed_version" do
+        DependencyChecker.expects(:installed_version).with(@sample_name, @sample_cmd ).once.returns( @sample_version )
+        DependencyChecker.check_dependency( @sample_name, :check_cmd => @sample_cmd, :version => @sample_version )
+      end
+    end
+
+    context "When checking multiple dependencies" do
+      should "call #check_dependency for each dependency" do
+        DependencyChecker.expects(:check_dependency).with(@sample_name, @sample_config ).once.returns( true )
+        DependencyChecker.expects(:check_dependency).with(@sample_name_2, @sample_config ).once.returns( true )
+        DependencyChecker.requirements = {@sample_name => @sample_config,
+                                          @sample_name_2 => @sample_config }
+        DependencyChecker.check_dependencies
+      end
+    end
+
+    context "When checking for an installed version" do
+      should "call #execute_command" do
+        CmdLineHelpers.expects(:execute_command).with(@sample_cmd, "requirement check").once.returns( @sample_version )
+        DependencyChecker.installed_version( @sample_name, @sample_cmd )
+      end
+    end
+
+    context "When a check_cmd doesn't exist for an executable" do
+      should "raise MissingVersionCheckException exception" do
+        assert_raise( MissingVersionCheckException ) {DependencyChecker.installed_version( @sample_name )}
+      end
+    end
+
+    context "When binary doesn't exist" do
+      should "raise VersionCheckFailException exception" do
+        assert_raise (VersionCheckFailException) {DependencyChecker.installed_version( @sample_name, @sample_cmd )}
+      end
+    end
+
+    context "When a version isn't identified" do
+      should "raise VersionCheckFailException exception" do
+        CmdLineHelpers.stubs(:execute_command).returns("")
+        assert_raise (VersionCheckFailException) {DependencyChecker.installed_version( @sample_name, @sample_cmd )}
+      end
+    end
+
+    context "When using the dependency checker module" do
+      should "have an attribute requirements" do
+        assert DependencyChecker.requirements
+      end
     end
   end
   
