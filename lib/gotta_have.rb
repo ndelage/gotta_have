@@ -1,6 +1,5 @@
-
 require 'gotta_have/exceptions'
 require 'gotta_have/cmd_line_helpers'
-require 'gotta_have/executable_checker'
+require 'gotta_have/dependency_checker'
 
-GottaHave::ExecutableChecker.check_dependencies
+GottaHave::DependencyChecker.check_dependencies

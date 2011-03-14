@@ -1,6 +1,7 @@
 module GottaHave
 
-  class ExecutableChecker
+  module DependencyChecker
+
     class << self; attr_accessor :requirements end
     @requirements = {}
 
@@ -41,29 +42,20 @@ module GottaHave
     end
 
     def self.correct_version?( required, installed, allow_newer=false )
-      # we remove any dots or dashes from the version numbers so we can do a
-      # simple comparison on the two values (as integers)
-      installed = ExecutableChecker.normalize_version( installed )
-      required = ExecutableChecker.normalize_version( required )
+
+      required = self.split_version( required )
+      installed = self.split_version( installed )
       
       if allow_newer
-        return installed >= required
+        return (installed <=> required) >= 0
       else
         return required == installed
       end
     end
 
-    def self.normalize_version( version )
-      # drop any non decimal or a-z characters from the version
-      version = version.gsub( /[^\d|a-z|A-Z]/, '' )
-
-      normalized = ""
-      # since some version numbers include a letter (e.g. 1.1a) we convert all
-      # chars in the version str to their ascii codes.
-      version.each_byte{ |b| normalized += b.to_s }
-      normalized.to_i
+    def self.split_version( version )
+      version.split( /\.|-|_/ ).map{ |s| s }
     end
-    
   end
   
 end
