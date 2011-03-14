@@ -2,12 +2,12 @@
 
 Checks for specific versions of command line utilities.
 
-== Usage
-
 If you make use of command line utilities (e.g. convert, exiftool, unzip ) it
 is often necessary to ensure you have the correct version of these utilities
 installed, much like using the correct version of a Ruby gem. GottaHave allows
 you to specify which binaries you should have installed and which versions.
+
+== Usage
 
 Specify your requirements by setting the requirements hash, for example:
 
@@ -35,8 +35,8 @@ You can easily add support for other utilites by setting the :check_cmd option:
 As in the example above, sometimes it's necessary to redirect stderr to stdout
 in order to capture the version information.
 
-GottaHave depends on the open4 to run and collect output from the command line.
-
+GottaHave depends on the open4 to run and collect output from the command line and
+the versionomy gem to parse and compare version number strings. 
 
 == License
 

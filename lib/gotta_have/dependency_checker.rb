@@ -1,6 +1,7 @@
 module GottaHave
 
   module DependencyChecker
+    require 'versionomy'
 
     class << self; attr_accessor :requirements end
     @requirements = {}
@@ -43,19 +44,16 @@ module GottaHave
 
     def self.correct_version?( required, installed, allow_newer=false )
 
-      required = self.split_version( required )
-      installed = self.split_version( installed )
+      required = Versionomy.parse( required )
+      installed = Versionomy.parse( installed )
       
       if allow_newer
-        return (installed <=> required) >= 0
+        return installed >= required
       else
         return required == installed
       end
     end
 
-    def self.split_version( version )
-      version.split( /\.|-|_/ ).map{ |s| s }
-    end
   end
   
 end
